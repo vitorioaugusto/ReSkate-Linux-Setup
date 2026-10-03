@@ -1,65 +1,67 @@
 # ReSkate Linux Setup
 
-Uma forma de configurar **Skate + ReSkate no Linux** usando Wine, VKD3D-Proton e DXVK, com um launcher simples e opções de backup, reparo e reinstalação.
+**English** | [Português (Brasil)](README.pt-BR.md)
 
-> **Status:** configuração desenvolvida e testada em Arch Linux/CachyOS com GPU NVIDIA RTX.  
-> O script foi escrito para ignorar automaticamente NVAPI/NGX/DLSS em AMD e Intel, mas essas GPUs ainda precisam de testes da comunidade.
+A convenient way to configure **Skate + ReSkate on Linux** using Wine, VKD3D-Proton and DXVK, with a simple launcher and built-in backup, repair and reinstall options.
 
-## O que o projeto faz
+> **Status:** developed and tested on Arch Linux/CachyOS with an NVIDIA RTX GPU.  
+> The script is designed to automatically skip NVAPI/NGX/DLSS on AMD and Intel GPUs, but those configurations still need more community testing.
 
-- cria um prefixo Wine dedicado ao ReSkate;
-- aplica o workaround necessário para `api-ms-win-core-debug-minidump-l1-1-0.dll`;
-- instala **VKD3D-Proton 3.0.1** para D3D12;
-- instala **DXVK 3.1** para DXGI;
-- em NVIDIA RTX:
-  - instala **DXVK-NVAPI 0.9.2**;
-  - configura NVIDIA NGX;
-  - habilita DLSS Super Resolution;
-- cria o launcher `~/.local/bin/reskate`;
-- cria atalhos `.desktop`;
-- permite backup, reparo, reinstalação do prefixo e recriação apenas dos atalhos.
+## What this project does
 
-## Pré-requisitos
+- creates a dedicated Wine prefix for ReSkate;
+- applies the workaround required for `api-ms-win-core-debug-minidump-l1-1-0.dll`;
+- installs **VKD3D-Proton 3.0.1** for D3D12;
+- installs **DXVK 3.1** for DXGI;
+- on NVIDIA RTX GPUs:
+  - installs **DXVK-NVAPI 0.9.2**;
+  - configures NVIDIA NGX;
+  - enables DLSS Super Resolution;
+- creates the `~/.local/bin/reskate` launcher;
+- creates `.desktop` shortcuts;
+- supports backup, repair, prefix reinstallation and launcher-only recreation.
 
-Você precisa ter o **Skate instalado pela Steam** e os arquivos do **ReSkate** já copiados para a pasta do jogo.
+## Requirements
 
-O projeto **não distribui** arquivos do Skate, ReSkate, NVIDIA NGX, DXVK, VKD3D-Proton ou Wine. Os componentes necessários são obtidos do sistema ou dos projetos oficiais durante a configuração.
+You need to have **Skate installed through Steam** and the **ReSkate files already copied into the game directory**.
+
+This project **does not distribute** files from Skate, ReSkate, NVIDIA NGX, DXVK, VKD3D-Proton or Wine. Required components are obtained from the local system or their official upstream projects during setup.
 
 ### Arch / CachyOS / Manjaro
 
-O script consegue instalar várias dependências automaticamente através do `pacman`.
+The script can automatically install several common dependencies through `pacman`.
 
-### Outras distribuições
+### Other distributions
 
-Antes de executar o setup, deixe disponíveis:
+Before running the setup, make sure you have:
 
-- Wine ou Wine-Staging 64-bit;
+- Wine or Wine-Staging 64-bit;
 - `curl`;
 - `tar`;
 - `zstd`;
-- driver Vulkan 64-bit e 32-bit correspondente à sua GPU.
+- the 64-bit and 32-bit Vulkan driver for your GPU.
 
-A parte de instalação de pacotes do sistema ainda é automatizada somente em distribuições baseadas em Arch.
+Automatic system package installation is currently implemented only for Arch-based distributions.
 
-## Uso
+## Usage
 
-Você pode executar diretamente o script:
+Run the setup script directly:
 
 ```bash
 bash scripts/reskate-setup.sh
 ```
 
-Sem argumentos, ele abre primeiro um menu interativo:
+With no arguments, it first opens an interactive menu:
 
 ```text
-1) Instalar / reparar a configuração
-2) Reinstalar o prefixo do zero
-3) Fazer apenas um backup
-4) Criar/recriar apenas o launcher e os atalhos
-5) Sair
+1) Install / repair the configuration
+2) Reinstall the Wine prefix from scratch
+3) Create a backup only
+4) Recreate only the launcher and shortcuts
+5) Exit
 ```
 
-Os modos também podem ser chamados diretamente:
+You can also call each mode directly:
 
 ```bash
 bash scripts/reskate-setup.sh --backup-only
@@ -68,49 +70,51 @@ bash scripts/reskate-setup.sh --reinstall
 bash scripts/reskate-setup.sh --launcher-only
 ```
 
-### Segurança
+> Note: the current interactive script UI is still in Portuguese. Documentation is available in both English and Brazilian Portuguese.
 
-Quando já existe um prefixo ReSkate, as opções de reparo e reinstalação criam um backup antes das alterações.
+### Safety
 
-Os backups são armazenados por padrão em:
+If a ReSkate Wine prefix already exists, repair and reinstall operations create a backup before making changes.
+
+Backups are stored by default in:
 
 ```text
 ~/ReSkate-backups/
 ```
 
-O modo `--launcher-only` não altera Wine, DLLs, registro, VKD3D, DXVK ou o prefixo.
+The `--launcher-only` mode does not modify Wine, DLLs, registry entries, VKD3D, DXVK or the Wine prefix.
 
-## Compilar o launcher
+## Building the launcher
 
-O repositório também contém um pequeno launcher em C que incorpora o script dentro de um único executável.
+The repository also includes a small C launcher that embeds the setup script into a single executable.
 
-Dependências de build:
+Build requirements:
 
 - GCC;
 - GNU Make;
 - Python 3.
 
-Build normal:
+Regular build:
 
 ```bash
 make
 ```
 
-Build estático:
+Static build:
 
 ```bash
 make static
 ```
 
-O resultado será:
+The output will be:
 
 ```text
 ReSkate-Setup-x86_64
 ```
 
-Quando aberto por duplo clique, o launcher tenta iniciar o setup em um terminal gráfico nesta ordem: **Konsole**, **GNOME Terminal**, **XFCE Terminal** e **xterm**.
+When launched by double-clicking, the executable tries to start the setup in a graphical terminal in this order: **Konsole**, **GNOME Terminal**, **XFCE Terminal**, then **xterm**.
 
-O script embutido é extraído temporariamente para:
+The embedded script is extracted at runtime to:
 
 ```text
 ~/.cache/reskate-setup/reskate-setup-final-safe.sh
@@ -118,28 +122,29 @@ O script embutido é extraído temporariamente para:
 
 ## Steam
 
-Depois de concluir a configuração, você pode adicionar como jogo não-Steam:
+After setup is complete, you can add the following file as a non-Steam game:
 
 ```text
 ~/.local/bin/reskate
 ```
 
-Não force Proton/Steam Play nesse atalho. O launcher já chama o Wine e o prefixo configurados pelo setup.
+Do not force Proton/Steam Play on that shortcut. The launcher already starts the configured Wine environment and prefix.
 
-## NVIDIA, AMD e Intel
+## NVIDIA, AMD and Intel
 
-A configuração de NVIDIA NVAPI/NGX/DLSS é condicional.
+NVIDIA NVAPI/NGX/DLSS configuration is conditional.
 
-Em uma NVIDIA RTX com driver proprietário ativo, o launcher habilita as variáveis usadas pelo DXVK-NVAPI e pelo DLSS.
+On a supported NVIDIA RTX GPU with the proprietary driver active, the launcher enables the variables required by DXVK-NVAPI and DLSS.
 
-Em AMD e Intel, o script pula essa seção e mantém apenas o caminho baseado em VKD3D-Proton + DXVK. Esse comportamento foi implementado para evitar que componentes NVIDIA sejam aplicados a outras GPUs, mas testes adicionais nessas placas são bem-vindos.
+On AMD and Intel GPUs, the script skips that section and keeps the graphics path based on VKD3D-Proton + DXVK. This behavior is intended to prevent NVIDIA-specific components from being applied to other GPUs, but additional testing on AMD and Intel hardware is welcome.
 
-## Estrutura do repositório
+## Repository structure
 
 ```text
 .
 ├── Makefile
 ├── README.md
+├── README.pt-BR.md
 ├── LICENSE
 ├── scripts/
 │   └── reskate-setup.sh
@@ -148,22 +153,22 @@ Em AMD e Intel, o script pula essa seção e mantém apenas o caminho baseado em
     └── launcher.c
 ```
 
-## Contribuições
+## Contributing
 
-Issues e pull requests são bem-vindos, especialmente para:
+Issues and pull requests are welcome, especially for:
 
-- testes em outras distribuições;
-- testes em GPUs AMD e Intel;
-- melhorias na detecção de caminhos da Steam;
-- suporte a outros terminais;
-- melhorias na instalação de dependências fora do ecossistema Arch.
+- testing on additional Linux distributions;
+- testing on AMD and Intel GPUs;
+- improvements to Steam path detection;
+- support for additional terminal emulators;
+- package installation improvements outside the Arch ecosystem.
 
-## Aviso
+## Disclaimer
 
-Este é um projeto comunitário e **não é afiliado à EA, Electronic Arts, ReSkate, NVIDIA, Valve, Wine, DXVK ou VKD3D-Proton**.
+This is a community project and **is not affiliated with EA, Electronic Arts, ReSkate, NVIDIA, Valve, Wine, DXVK or VKD3D-Proton**.
 
-Todas as marcas pertencem aos seus respectivos proprietários.
+All trademarks belong to their respective owners.
 
-## Licença
+## License
 
-Este projeto é distribuído sob a [MIT License](LICENSE).
+This project is distributed under the [MIT License](LICENSE).
