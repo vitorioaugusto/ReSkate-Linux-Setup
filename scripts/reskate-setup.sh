@@ -99,10 +99,18 @@ discover_game_dirs(){
   for candidate in "${found[@]}"; do
     existing=0
     for path in "${GAME_CANDIDATES[@]:-}"; do
-      [[ "$path" == "$candidate" ]] && existing=1 && break
+      if [[ "$path" == "$candidate" ]]; then
+        existing=1
+        break
+      fi
     done
-    (( existing == 0 )) && GAME_CANDIDATES+=("$candidate")
+
+    if (( existing == 0 )); then
+      GAME_CANDIDATES+=("$candidate")
+    fi
   done
+
+  return 0
 }
 
 normalize_game_dir(){
@@ -232,18 +240,27 @@ detect_gpu(){
     GPU_MODEL="$(nvidia-smi --query-gpu=name --format=csv,noheader 2>/dev/null | head -n1 || true)"
     if [[ -n "$GPU_MODEL" ]]; then
       GPU_VENDOR="nvidia"
-      grep -qi RTX <<<"$GPU_MODEL" && DLSS_CAPABLE=1
-      return
+      if grep -qi RTX <<<"$GPU_MODEL"; then
+        DLSS_CAPABLE=1
+      fi
+      return 0
     fi
   fi
 
   if command -v lspci >/dev/null 2>&1; then
     local lines
     lines="$(lspci 2>/dev/null | grep -Ei 'VGA|3D|Display' || true)"
-    grep -qi NVIDIA <<<"$lines" && GPU_VENDOR="nvidia"
-    grep -Eqi 'AMD|ATI' <<<"$lines" && GPU_VENDOR="amd"
-    grep -qi Intel <<<"$lines" && GPU_VENDOR="intel"
+
+    if grep -qi NVIDIA <<<"$lines"; then
+      GPU_VENDOR="nvidia"
+    elif grep -Eqi 'AMD|ATI' <<<"$lines"; then
+      GPU_VENDOR="amd"
+    elif grep -qi Intel <<<"$lines"; then
+      GPU_VENDOR="intel"
+    fi
   fi
+
+  return 0
 }
 
 detect_gpu
