@@ -1,0 +1,43 @@
+name: Build and publish release
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/release.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Build static executable
+        run: make static
+
+      - name: Package executable
+        run: |
+          chmod +x ReSkate-Setup-x86_64
+          tar -czf ReSkate-Setup-x86_64.tar.gz ReSkate-Setup-x86_64
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: v0.1.0
+        run: |
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG"               ReSkate-Setup-x86_64               ReSkate-Setup-x86_64.tar.gz               --clobber
+          else
+            gh release create "$TAG"               ReSkate-Setup-x86_64               ReSkate-Setup-x86_64.tar.gz               --target "$GITHUB_SHA"               --title "ReSkate Linux Setup v0.1.0"               --notes "Initial public release of ReSkate Linux Setup.
+
+Download **ReSkate-Setup-x86_64.tar.gz** for the easiest setup: extract it and run the included executable.
+
+The raw **ReSkate-Setup-x86_64** binary is also provided."
+          fi
