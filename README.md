@@ -24,17 +24,64 @@ A convenient way to configure **Skate + ReSkate on Linux** using Wine, VKD3D-Pro
 - creates `.desktop` shortcuts;
 - supports backup, repair, prefix reinstallation and launcher-only recreation.
 
-## Requirements
+## Requirements and preparation
 
-You need to have **Skate installed through Steam** and the **ReSkate files already copied into the game directory**.
+Before using ReSkate Linux Setup, prepare the game and ReSkate first.
 
-This project **does not distribute** files from Skate, ReSkate, NVIDIA NGX, DXVK, VKD3D-Proton or Wine. Required components are obtained from the local system or their official upstream projects during setup.
+### 1. Install skate. through Steam
 
-### Arch / CachyOS / Manjaro
+Install **skate.** normally through Steam.
+
+Once the download is complete, locate the game folder through:
+
+```text
+Steam → Library → skate. → Manage → Browse local files
+```
+
+Keep this folder open. It is the folder that contains `Skate.exe`.
+
+### 2. Download ReSkate
+
+Open the official ReSkate Releases page:
+
+[**Download ReSkate from Dingo-Shenanigans/ReSkate**](https://github.com/Dingo-Shenanigans/ReSkate/releases/latest)
+
+Download the latest:
+
+```text
+ReSkate-<version>.zip
+```
+
+### 3. Extract ReSkate into the skate. folder
+
+Extract the contents of the ReSkate ZIP into the **same folder that contains `Skate.exe`**.
+
+After extraction, the important ReSkate files should be beside the game executable, for example:
+
+```text
+Skate/
+├── Skate.exe
+├── ReSkateLauncher.exe
+├── ReSkate.dll
+└── ...
+```
+
+Do **not** leave the ReSkate files inside an extra nested folder such as `Skate/ReSkate-1.x.x/`.
+
+### 4. Run ReSkate Linux Setup
+
+Only after the game and ReSkate files are in place should you use the executable from this repository. The setup detects the skate. folder and configures the Wine/Vulkan environment required to launch ReSkate on Linux.
+
+> [!NOTE]
+> This project **does not distribute** Skate or ReSkate files. You must obtain skate. through Steam and ReSkate from its official GitHub repository.
+
+### Linux dependencies
+
+#### Arch / CachyOS / Manjaro
 
 The script can automatically install several common dependencies through `pacman`.
 
-### Other distributions
+#### Other distributions
 
 Before running the setup, make sure you have:
 
