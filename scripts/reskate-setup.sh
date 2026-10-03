@@ -11,12 +11,12 @@ GAME_DIR="${GAME_DIR:-}"
 MODE="auto"
 
 log(){ printf '\n==> %s\n' "$*"; }
-warn(){ printf '\nAVISO: %s\n' "$*" >&2; }
-die(){ printf '\nERRO: %s\n' "$*" >&2; exit 1; }
+warn(){ printf '\nWARNING: %s\n' "$*" >&2; }
+die(){ printf '\nERROR: %s\n' "$*" >&2; exit 1; }
 
 usage(){
 cat <<'EOF'
-Uso:
+Usage:
   reskate-setup.sh
   reskate-setup.sh --backup-only
   reskate-setup.sh --repair
@@ -32,7 +32,7 @@ while [[ $# -gt 0 ]]; do
     --reinstall) MODE="reinstall" ;;
     --launcher-only) MODE="launcher-only" ;;
     --help|-h) usage; exit 0 ;;
-    *) die "Opção desconhecida: $1" ;;
+    *) die "Unknown option: $1" ;;
   esac
   shift
 done
@@ -43,20 +43,20 @@ if [[ "$MODE" == "auto" ]]; then
   echo " ReSkate Linux Setup"
   echo "============================================================"
   echo
-  echo "  1) Instalar / reparar a configuração"
-  echo "  2) Reinstalar o prefixo do zero"
-  echo "  3) Fazer apenas um backup"
-  echo "  4) Criar/recriar apenas o launcher e os atalhos"
-  echo "  5) Sair"
+  echo "  1) Install / repair the configuration"
+  echo "  2) Reinstall the Wine prefix from scratch"
+  echo "  3) Create a backup only"
+  echo "  4) Recreate only the launcher and shortcuts"
+  echo "  5) Exit"
   echo
-  read -r -p "Digite um número (padrão=1): " choice
+  read -r -p "Enter a number (default=1): " choice
   case "${choice:-1}" in
     1) MODE="repair" ;;
     2) MODE="reinstall" ;;
     3) MODE="backup-only" ;;
     4) MODE="launcher-only" ;;
     5) exit 0 ;;
-    *) die "Opção inválida." ;;
+    *) die "Invalid option." ;;
   esac
 fi
 
@@ -65,7 +65,7 @@ cleanup(){
 }
 trap cleanup EXIT
 
-[[ "$(uname -m)" == "x86_64" ]] || die "Este setup suporta Linux x86_64."
+[[ "$(uname -m)" == "x86_64" ]] || die "This setup supports Linux x86_64 only."
 
 discover_game_dirs(){
   local -a steam_roots=()
@@ -141,21 +141,21 @@ choose_game_dir(){
 
   echo
   echo "============================================================"
-  echo " Localização do skate."
+  echo " skate. installation location"
   echo "============================================================"
   echo
-  echo "Antes de continuar, confirme onde o jogo está instalado."
-  echo "Isso é importante se você usa outra biblioteca da Steam ou outro SSD."
+  echo "Before continuing, confirm where the game is installed."
+  echo "This is important if you use another Steam library or a different SSD."
   echo
 
   if (( ${#GAME_CANDIDATES[@]} > 0 )); then
-    echo "Instalações detectadas:"
+    echo "Detected installations:"
     for i in "${!GAME_CANDIDATES[@]}"; do
       printf '  %d) %s\n' "$((i + 1))" "${GAME_CANDIDATES[$i]}"
     done
     echo
-    echo "Você pode digitar o número da instalação ou colar um caminho manualmente."
-    read -r -p "Local do jogo (padrão=1): " answer
+    echo "Enter the installation number or paste a custom path."
+    read -r -p "Game location (default=1): " answer
     answer="${answer:-1}"
 
     if [[ "$answer" =~ ^[0-9]+$ ]] && (( answer >= 1 && answer <= ${#GAME_CANDIDATES[@]} )); then
@@ -164,11 +164,11 @@ choose_game_dir(){
       GAME_DIR="$(normalize_game_dir "$answer")"
     fi
   else
-    echo "Não encontrei automaticamente uma instalação válida."
-    echo "Abra na Steam: Biblioteca → skate. → Gerenciar → Procurar arquivos locais"
-    echo "e cole abaixo o caminho da pasta que contém Skate.exe."
+    echo "No valid installation was detected automatically."
+    echo "In Steam, open: Library → skate. → Manage → Browse local files"
+    echo "Then paste below the path to the folder that contains Skate.exe."
     echo
-    read -r -p "Pasta do skate.: " answer
+    read -r -p "skate. folder: " answer
     GAME_DIR="$(normalize_game_dir "$answer")"
   fi
 
@@ -181,7 +181,7 @@ choose_game_dir(){
 
     if (( status == 0 )); then
       echo
-      echo "Jogo confirmado em:"
+      echo "Game confirmed at:"
       echo "  $GAME_DIR"
       echo
       return
@@ -189,13 +189,13 @@ choose_game_dir(){
 
     echo
     if (( status == 2 )); then
-      warn "Skate.exe foi encontrado, mas ReSkateLauncher.exe não está nessa pasta."
-      echo "Extraia os arquivos do ReSkate na mesma pasta do Skate.exe antes de continuar."
+      warn "Skate.exe was found, but ReSkateLauncher.exe is not in this folder."
+      echo "Extract the ReSkate files into the same folder as Skate.exe before continuing."
     else
-      warn "Não encontrei Skate.exe em: $GAME_DIR"
+      warn "Skate.exe was not found in: $GAME_DIR"
     fi
 
-    read -r -p "Digite outro caminho ou 'q' para sair: " answer
+    read -r -p "Enter another path or 'q' to quit: " answer
     [[ "$answer" == "q" || "$answer" == "Q" ]] && exit 1
     GAME_DIR="$(normalize_game_dir "$answer")"
   done
@@ -203,7 +203,7 @@ choose_game_dir(){
 
 if [[ -n "$GAME_DIR" ]]; then
   GAME_DIR="$(normalize_game_dir "$GAME_DIR")"
-  validate_game_dir "$GAME_DIR" || die "GAME_DIR inválido ou sem os arquivos do ReSkate: $GAME_DIR"
+  validate_game_dir "$GAME_DIR" || die "Invalid GAME_DIR or missing ReSkate files: $GAME_DIR"
 elif [[ -t 0 && -t 1 ]]; then
   choose_game_dir
 else
@@ -212,9 +212,9 @@ else
   if (( ${#GAME_CANDIDATES[@]} == 1 )); then
     GAME_DIR="${GAME_CANDIDATES[0]}"
   elif (( ${#GAME_CANDIDATES[@]} > 1 )); then
-    die "Foram encontradas várias instalações do skate. Defina GAME_DIR=/caminho/para/Skate."
+    die "Multiple skate. installations were found. Set GAME_DIR=/path/to/Skate."
   else
-    die "Skate não encontrado. Defina GAME_DIR=/caminho/para/Skate."
+    die "skate. was not found. Set GAME_DIR=/path/to/Skate."
   fi
 fi
 
@@ -264,12 +264,12 @@ make_backup(){
   } > "$dir/info.txt"
 
   if (( PREFIX_EXISTS )); then
-    command -v tar >/dev/null || die "tar é necessário para backup."
-    command -v zstd >/dev/null || die "zstd é necessário para backup."
+    command -v tar >/dev/null || die "tar is required for backups."
+    command -v zstd >/dev/null || die "zstd is required for backups."
     parent="$(dirname "$PREFIX")"
     name="$(basename "$PREFIX")"
     tar -C "$parent" -cf - "$name" | zstd -T0 -3 -q -o "$dir/prefix.tar.zst"
-    [[ -s "$dir/prefix.tar.zst" ]] || die "Falha ao criar backup."
+    [[ -s "$dir/prefix.tar.zst" ]] || die "Failed to create backup."
   fi
 
   [[ -f "$HOME/.local/bin/reskate" ]] && cp -a "$HOME/.local/bin/reskate" "$dir/launcher/" || true
@@ -306,7 +306,7 @@ EOF
 [Desktop Entry]
 Type=Application
 Name=ReSkate
-Comment=Skate offline via ReSkate e Wine
+Comment=Skate offline via ReSkate and Wine
 Exec=$HOME/.local/bin/reskate
 Icon=applications-games
 Terminal=false
@@ -320,49 +320,49 @@ EOF
   [[ -n "$desktop" ]] || desktop="$HOME/Desktop"
   [[ -d "$desktop" ]] && cp -f "$HOME/.local/share/applications/reskate.desktop" "$desktop/ReSkate.desktop" || true
 
-  echo "Launcher criado em $HOME/.local/bin/reskate"
+  echo "Launcher created at $HOME/.local/bin/reskate"
 }
 
 if [[ "$MODE" == "launcher-only" ]]; then
-  (( PREFIX_EXISTS )) || die "Prefixo não encontrado em $PREFIX"
+  (( PREFIX_EXISTS )) || die "Wine prefix not found at $PREFIX"
   create_launcher
   exit 0
 fi
 
 if [[ "$MODE" == "backup-only" ]]; then
   dir="$(make_backup)"
-  echo "Backup criado em: $dir"
+  echo "Backup created at: $dir"
   exit 0
 fi
 
 if (( PREFIX_EXISTS )); then
   dir="$(make_backup)"
-  echo "Backup criado em: $dir"
+  echo "Backup created at: $dir"
 fi
 
 if [[ "$MODE" == "reinstall" && "$PREFIX_EXISTS" -eq 1 ]]; then
   WINEPREFIX="$PREFIX" wineserver -k >/dev/null 2>&1 || true
-  [[ "$PREFIX" == "$HOME/"* ]] || die "Recusando remover prefixo fora da HOME."
+  [[ "$PREFIX" == "$HOME/"* ]] || die "Refusing to remove a Wine prefix outside HOME."
   rm -rf -- "$PREFIX"
 fi
 
 if command -v pacman >/dev/null 2>&1; then
-  log "Instalando/verificando dependências no Arch"
+  log "Installing/checking dependencies on Arch"
   sudo pacman -S --needed wine-staging curl tar zstd pciutils vulkan-icd-loader lib32-vulkan-icd-loader
   detect_gpu
   [[ "$GPU_VENDOR" == "nvidia" && -x "$(command -v nvidia-smi || true)" ]] && sudo pacman -S --needed nvidia-utils lib32-nvidia-utils || true
   [[ "$GPU_VENDOR" == "amd" ]] && sudo pacman -S --needed vulkan-radeon lib32-vulkan-radeon || true
   [[ "$GPU_VENDOR" == "intel" ]] && sudo pacman -S --needed vulkan-intel lib32-vulkan-intel || true
 else
-  warn "Distro não-Arch: instale Wine, curl, tar, zstd e Vulkan 64/32-bit manualmente."
+  warn "Non-Arch distribution: install Wine, curl, tar, zstd, and 64/32-bit Vulkan support manually."
 fi
 
 for cmd in wine wineboot wineserver curl tar zstd; do
-  command -v "$cmd" >/dev/null 2>&1 || die "Comando ausente: $cmd"
+  command -v "$cmd" >/dev/null 2>&1 || die "Missing command: $cmd"
 done
 
 detect_gpu
-echo "GPU detectada: $GPU_VENDOR ${GPU_MODEL:+($GPU_MODEL)}"
+echo "Detected GPU: $GPU_VENDOR ${GPU_MODEL:+($GPU_MODEL)}"
 
 mkdir -p "$PREFIX"
 if [[ ! -f "$PREFIX/system.reg" ]]; then
@@ -374,22 +374,22 @@ WINEPREFIX="$PREFIX" wineserver -w || true
 
 SYSTEM32="$PREFIX/drive_c/windows/system32"
 SYSWOW64="$PREFIX/drive_c/windows/syswow64"
-[[ -f "$SYSTEM32/dbghelp.dll" ]] || die "dbghelp.dll não encontrado."
+[[ -f "$SYSTEM32/dbghelp.dll" ]] || die "dbghelp.dll was not found."
 
 MINIDUMP_API="$SYSTEM32/api-ms-win-core-debug-minidump-l1-1-0.dll"
 [[ -e "$MINIDUMP_API" ]] || ln -s dbghelp.dll "$MINIDUMP_API"
 
 TMPDIR_RES="$(mktemp -d)"
 
-log "Instalando VKD3D-Proton $VKD3D_VERSION"
+log "Installing VKD3D-Proton $VKD3D_VERSION"
 curl -fL --retry 3 -o "$TMPDIR_RES/vkd3d.tar.zst"   "https://github.com/HansKristian-Work/vkd3d-proton/releases/download/v${VKD3D_VERSION}/vkd3d-proton-${VKD3D_VERSION}.tar.zst"
 tar -xf "$TMPDIR_RES/vkd3d.tar.zst" -C "$TMPDIR_RES"
 VKD3D_SETUP="$(find "$TMPDIR_RES" -type f -name setup_vkd3d_proton.sh -print -quit)"
-[[ -n "$VKD3D_SETUP" ]] || die "Instalador VKD3D-Proton não encontrado."
+[[ -n "$VKD3D_SETUP" ]] || die "VKD3D-Proton installer was not found."
 chmod +x "$VKD3D_SETUP"
 WINEPREFIX="$PREFIX" "$VKD3D_SETUP" install
 
-log "Instalando DXVK $DXVK_VERSION (DXGI)"
+log "Installing DXVK $DXVK_VERSION (DXGI)"
 curl -fL --retry 3 -o "$TMPDIR_RES/dxvk.tar.gz"   "https://github.com/doitsujin/dxvk/releases/download/v${DXVK_VERSION}/dxvk-${DXVK_VERSION}.tar.gz"
 tar -xzf "$TMPDIR_RES/dxvk.tar.gz" -C "$TMPDIR_RES"
 DXGI64="$(find "$TMPDIR_RES" -type f -path '*/x64/dxgi.dll' -print -quit)"
@@ -399,7 +399,7 @@ cp -f "$DXGI32" "$SYSWOW64/dxgi.dll"
 WINEPREFIX="$PREFIX" wine reg add 'HKCU\Software\Wine\DllOverrides' /v dxgi /d 'native,builtin' /f >/dev/null
 
 if (( DLSS_CAPABLE )); then
-  log "Configurando DXVK-NVAPI $NVAPI_VERSION e NVIDIA NGX"
+  log "Configuring DXVK-NVAPI $NVAPI_VERSION and NVIDIA NGX"
   curl -fL --retry 3 -o "$TMPDIR_RES/nvapi.tar.gz"     "https://github.com/jp7677/dxvk-nvapi/releases/download/v${NVAPI_VERSION}/dxvk-nvapi-v${NVAPI_VERSION}.tar.gz"
   mkdir -p "$TMPDIR_RES/nvapi"
   tar -xzf "$TMPDIR_RES/nvapi.tar.gz" -C "$TMPDIR_RES/nvapi"
@@ -428,7 +428,7 @@ if (( DLSS_CAPABLE )); then
     done
   fi
 
-  [[ -n "$NVIDIA_WINE_DIR" ]] || die "RTX detectada, mas nvngx.dll/_nvngx.dll não foram encontrados."
+  [[ -n "$NVIDIA_WINE_DIR" ]] || die "An RTX GPU was detected, but nvngx.dll/_nvngx.dll were not found."
 
   cp -f "$NVIDIA_WINE_DIR/nvngx.dll" "$SYSTEM32/nvngx.dll"
   cp -f "$NVIDIA_WINE_DIR/_nvngx.dll" "$SYSTEM32/_nvngx.dll"
@@ -443,7 +443,7 @@ if (( DLSS_CAPABLE )); then
   WINEPREFIX="$PREFIX" wine reg add 'HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm\Parameters\NGXCore'     /v NGXPath /t REG_SZ /d 'C:\Windows\System32' /f /reg:64 >/dev/null
   WINEPREFIX="$PREFIX" wine reg add 'HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm\NGXCore'     /v NGXPath /t REG_SZ /d 'C:\Windows\System32' /f /reg:64 >/dev/null
 else
-  log "GPU sem DLSS: configuração NVIDIA/NGX ignorada"
+  log "GPU without DLSS support: skipping NVIDIA/NGX configuration"
 fi
 
 cat > "$PREFIX/.reskate-linux-setup" <<EOF
@@ -460,12 +460,12 @@ create_launcher
 
 echo
 echo "============================================================"
-echo " ReSkate configurado com sucesso"
+echo " ReSkate configured successfully"
 echo "============================================================"
-echo "Jogo:    $GAME_DIR"
-echo "Prefixo: $PREFIX"
+echo "Game:     $GAME_DIR"
+echo "Prefix:   $PREFIX"
 echo "Wine:    $(wine --version)"
 echo "VKD3D:   $VKD3D_VERSION"
 echo "DXVK:    $DXVK_VERSION"
-(( DLSS_CAPABLE )) && echo "DLSS SR: configurado" || echo "DLSS SR: não ativado"
+(( DLSS_CAPABLE )) && echo "DLSS SR: configured" || echo "DLSS SR: not enabled"
 echo "Launcher: $HOME/.local/bin/reskate"
