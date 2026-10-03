@@ -129,6 +129,8 @@ With no arguments, it first opens an interactive menu:
 5) Exit
 ```
 
+After you choose an action, the installer asks you to confirm the **skate. installation folder before making changes**. It checks the default Steam location and additional Steam library folders, including libraries stored on other SSDs. If it finds more than one installation, you can choose the correct one; you can also paste a custom path manually.
+
 You can also call each mode directly:
 
 ```bash
