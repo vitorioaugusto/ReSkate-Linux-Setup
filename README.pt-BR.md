@@ -46,6 +46,24 @@ Antes de executar o setup, deixe disponíveis:
 
 A parte de instalação de pacotes do sistema ainda é automatizada somente em distribuições baseadas em Arch.
 
+## Baixar o executável
+
+Se você só quer usar o setup sem clonar o repositório ou compilar nada, baixe o executável pronto pela página de **Releases**:
+
+[**Baixar a versão mais recente**](https://github.com/vitorioaugusto/ReSkate-Linux-Setup/releases/latest)
+
+Para a forma mais simples, baixe:
+
+```text
+ReSkate-Setup-x86_64.tar.gz
+```
+
+Depois é só extrair o arquivo e dar dois cliques em `ReSkate-Setup-x86_64`.
+
+O arquivo compactado preserva a permissão de execução, então na maioria dos gerenciadores de arquivos Linux você não deve precisar usar `chmod` manualmente.
+
+O binário avulso `ReSkate-Setup-x86_64` também fica disponível na Release. Se o seu gerenciador de arquivos não permitir executá-lo, ative a permissão em **Propriedades → Permissões**.
+
 ## Uso
 
 Você pode executar diretamente o script:
