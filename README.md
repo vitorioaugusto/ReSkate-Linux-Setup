@@ -163,6 +163,10 @@ Issues and pull requests are welcome, especially for:
 - support for additional terminal emulators;
 - package installation improvements outside the Arch ecosystem.
 
+## Development note
+
+**The entire codebase in this project was vibe-coded with AI assistance.** The implementation was built iteratively through prompting, testing, debugging and refinement rather than through a traditional from-scratch coding workflow.
+
 ## Disclaimer
 
 This is a community project and **is not affiliated with EA, Electronic Arts, ReSkate, NVIDIA, Valve, Wine, DXVK or VKD3D-Proton**.
