@@ -67,16 +67,153 @@ trap cleanup EXIT
 
 [[ "$(uname -m)" == "x86_64" ]] || die "Este setup suporta Linux x86_64."
 
-if [[ -z "$GAME_DIR" ]]; then
-  for candidate in     "$HOME/.local/share/Steam/steamapps/common/Skate"     "$HOME/.steam/steam/steamapps/common/Skate"     "$HOME/.var/app/com.valvesoftware.Steam/.local/share/Steam/steamapps/common/Skate"
-  do
-    [[ -f "$candidate/Skate.exe" ]] && GAME_DIR="$candidate" && break
-  done
-fi
+discover_game_dirs(){
+  local -a steam_roots=()
+  local -a found=()
+  local vdf root line path candidate existing
 
-[[ -n "$GAME_DIR" ]] || die "Skate não encontrado. Defina GAME_DIR=/caminho/para/Skate."
-[[ -f "$GAME_DIR/Skate.exe" ]] || die "Skate.exe não encontrado em $GAME_DIR"
-[[ -f "$GAME_DIR/ReSkateLauncher.exe" ]] || die "ReSkateLauncher.exe não encontrado em $GAME_DIR"
+  steam_roots+=(
+    "$HOME/.local/share/Steam"
+    "$HOME/.steam/steam"
+    "$HOME/.var/app/com.valvesoftware.Steam/.local/share/Steam"
+  )
+
+  for root in "${steam_roots[@]}"; do
+    candidate="$root/steamapps/common/Skate"
+    if [[ -f "$candidate/Skate.exe" ]]; then
+      found+=("$candidate")
+    fi
+
+    vdf="$root/steamapps/libraryfolders.vdf"
+    [[ -f "$vdf" ]] || continue
+
+    while IFS= read -r line; do
+      if [[ "$line" =~ \"path\"[[:space:]]+\"([^\"]+)\" ]]; then
+        path="${BASH_REMATCH[1]}"
+        candidate="$path/steamapps/common/Skate"
+        [[ -f "$candidate/Skate.exe" ]] && found+=("$candidate")
+      fi
+    done < "$vdf"
+  done
+
+  for candidate in "${found[@]}"; do
+    existing=0
+    for path in "${GAME_CANDIDATES[@]:-}"; do
+      [[ "$path" == "$candidate" ]] && existing=1 && break
+    done
+    (( existing == 0 )) && GAME_CANDIDATES+=("$candidate")
+  done
+}
+
+normalize_game_dir(){
+  local value="$1"
+  value="${value%\"}"
+  value="${value#\"}"
+  value="${value%\'}"
+  value="${value#\'}"
+
+  if [[ "$value" == "~" ]]; then
+    value="$HOME"
+  elif [[ "$value" == "~/"* ]]; then
+    value="$HOME/${value#~/}"
+  fi
+
+  if [[ -f "$value" && "$(basename "$value")" == "Skate.exe" ]]; then
+    value="$(dirname "$value")"
+  fi
+
+  value="${value%/}"
+  printf '%s\n' "$value"
+}
+
+validate_game_dir(){
+  local dir="$1"
+  [[ -d "$dir" ]] || return 1
+  [[ -f "$dir/Skate.exe" ]] || return 1
+  [[ -f "$dir/ReSkateLauncher.exe" ]] || return 2
+  return 0
+}
+
+choose_game_dir(){
+  local answer status i
+  GAME_CANDIDATES=()
+  discover_game_dirs
+
+  echo
+  echo "============================================================"
+  echo " Localização do skate."
+  echo "============================================================"
+  echo
+  echo "Antes de continuar, confirme onde o jogo está instalado."
+  echo "Isso é importante se você usa outra biblioteca da Steam ou outro SSD."
+  echo
+
+  if (( ${#GAME_CANDIDATES[@]} > 0 )); then
+    echo "Instalações detectadas:"
+    for i in "${!GAME_CANDIDATES[@]}"; do
+      printf '  %d) %s\n' "$((i + 1))" "${GAME_CANDIDATES[$i]}"
+    done
+    echo
+    echo "Você pode digitar o número da instalação ou colar um caminho manualmente."
+    read -r -p "Local do jogo (padrão=1): " answer
+    answer="${answer:-1}"
+
+    if [[ "$answer" =~ ^[0-9]+$ ]] && (( answer >= 1 && answer <= ${#GAME_CANDIDATES[@]} )); then
+      GAME_DIR="${GAME_CANDIDATES[$((answer - 1))]}"
+    else
+      GAME_DIR="$(normalize_game_dir "$answer")"
+    fi
+  else
+    echo "Não encontrei automaticamente uma instalação válida."
+    echo "Abra na Steam: Biblioteca → skate. → Gerenciar → Procurar arquivos locais"
+    echo "e cole abaixo o caminho da pasta que contém Skate.exe."
+    echo
+    read -r -p "Pasta do skate.: " answer
+    GAME_DIR="$(normalize_game_dir "$answer")"
+  fi
+
+  while true; do
+    validate_game_dir "$GAME_DIR"
+    status=$?
+
+    if (( status == 0 )); then
+      echo
+      echo "Jogo confirmado em:"
+      echo "  $GAME_DIR"
+      echo
+      return
+    fi
+
+    echo
+    if (( status == 2 )); then
+      warn "Skate.exe foi encontrado, mas ReSkateLauncher.exe não está nessa pasta."
+      echo "Extraia os arquivos do ReSkate na mesma pasta do Skate.exe antes de continuar."
+    else
+      warn "Não encontrei Skate.exe em: $GAME_DIR"
+    fi
+
+    read -r -p "Digite outro caminho ou 'q' para sair: " answer
+    [[ "$answer" == "q" || "$answer" == "Q" ]] && exit 1
+    GAME_DIR="$(normalize_game_dir "$answer")"
+  done
+}
+
+if [[ -n "$GAME_DIR" ]]; then
+  GAME_DIR="$(normalize_game_dir "$GAME_DIR")"
+  validate_game_dir "$GAME_DIR" || die "GAME_DIR inválido ou sem os arquivos do ReSkate: $GAME_DIR"
+elif [[ -t 0 && -t 1 ]]; then
+  choose_game_dir
+else
+  GAME_CANDIDATES=()
+  discover_game_dirs
+  if (( ${#GAME_CANDIDATES[@]} == 1 )); then
+    GAME_DIR="${GAME_CANDIDATES[0]}"
+  elif (( ${#GAME_CANDIDATES[@]} > 1 )); then
+    die "Foram encontradas várias instalações do skate. Defina GAME_DIR=/caminho/para/Skate."
+  else
+    die "Skate não encontrado. Defina GAME_DIR=/caminho/para/Skate."
+  fi
+fi
 
 PREFIX_EXISTS=0
 [[ -f "$PREFIX/system.reg" && -d "$PREFIX/drive_c" ]] && PREFIX_EXISTS=1
