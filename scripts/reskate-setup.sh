@@ -173,8 +173,11 @@ choose_game_dir(){
   fi
 
   while true; do
-    validate_game_dir "$GAME_DIR"
-    status=$?
+    if validate_game_dir "$GAME_DIR"; then
+      status=0
+    else
+      status=$?
+    fi
 
     if (( status == 0 )); then
       echo
