@@ -140,7 +140,7 @@ bash scripts/reskate-setup.sh --reinstall
 bash scripts/reskate-setup.sh --launcher-only
 ```
 
-> Note: the current interactive script UI is still in Portuguese. Documentation is available in both English and Brazilian Portuguese.
+> The application interface is in English. Documentation is available in both English and Brazilian Portuguese.
 
 ### Safety
 
