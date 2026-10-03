@@ -33,11 +33,7 @@ jobs:
           TAG: v0.1.0
         run: |
           if gh release view "$TAG" >/dev/null 2>&1; then
-            gh release upload "$TAG"               ReSkate-Setup-x86_64               ReSkate-Setup-x86_64.tar.gz               --clobber
+            gh release upload "$TAG" ReSkate-Setup-x86_64 ReSkate-Setup-x86_64.tar.gz --clobber
           else
-            gh release create "$TAG"               ReSkate-Setup-x86_64               ReSkate-Setup-x86_64.tar.gz               --target "$GITHUB_SHA"               --title "ReSkate Linux Setup v0.1.0"               --notes "Initial public release of ReSkate Linux Setup.
-
-Download **ReSkate-Setup-x86_64.tar.gz** for the easiest setup: extract it and run the included executable.
-
-The raw **ReSkate-Setup-x86_64** binary is also provided."
+            gh release create "$TAG" ReSkate-Setup-x86_64 ReSkate-Setup-x86_64.tar.gz --target "$GITHUB_SHA" --title "ReSkate Linux Setup v0.1.0" --notes "Initial public release. For the easiest setup, download ReSkate-Setup-x86_64.tar.gz, extract it, and run the included executable."
           fi
