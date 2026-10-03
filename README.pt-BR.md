@@ -129,6 +129,8 @@ Sem argumentos, ele abre primeiro um menu interativo:
 5) Sair
 ```
 
+Depois que você escolhe a ação, o instalador pede para confirmar a **pasta onde o skate. está instalado antes de fazer qualquer alteração**. Ele verifica o local padrão da Steam e também bibliotecas adicionais da Steam, inclusive as que ficam em outros SSDs. Se encontrar mais de uma instalação, você pode escolher a correta; também é possível colar um caminho manualmente.
+
 Os modos também podem ser chamados diretamente:
 
 ```bash
