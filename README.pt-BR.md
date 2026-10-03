@@ -119,14 +119,14 @@ Você pode executar diretamente o script:
 bash scripts/reskate-setup.sh
 ```
 
-Sem argumentos, ele abre primeiro um menu interativo:
+Sem argumentos, ele abre primeiro um menu interativo. **A interface do aplicativo é exibida em inglês**:
 
 ```text
-1) Instalar / reparar a configuração
-2) Reinstalar o prefixo do zero
-3) Fazer apenas um backup
-4) Criar/recriar apenas o launcher e os atalhos
-5) Sair
+1) Install / repair the configuration
+2) Reinstall the Wine prefix from scratch
+3) Create a backup only
+4) Recreate only the launcher and shortcuts
+5) Exit
 ```
 
 Depois que você escolhe a ação, o instalador pede para confirmar a **pasta onde o skate. está instalado antes de fazer qualquer alteração**. Ele verifica o local padrão da Steam e também bibliotecas adicionais da Steam, inclusive as que ficam em outros SSDs. Se encontrar mais de uma instalação, você pode escolher a correta; também é possível colar um caminho manualmente.
