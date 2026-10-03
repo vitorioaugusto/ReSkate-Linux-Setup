@@ -46,6 +46,24 @@ Before running the setup, make sure you have:
 
 Automatic system package installation is currently implemented only for Arch-based distributions.
 
+## Download the executable
+
+If you just want to use the setup without cloning the repository or compiling anything, download the prebuilt executable from the **Releases** page:
+
+[**Download the latest release**](https://github.com/vitorioaugusto/ReSkate-Linux-Setup/releases/latest)
+
+For the easiest experience, download:
+
+```text
+ReSkate-Setup-x86_64.tar.gz
+```
+
+Then extract the archive and double-click `ReSkate-Setup-x86_64`.
+
+The archive preserves the executable permission, so in most Linux file managers you should not need to run `chmod` manually.
+
+A raw `ReSkate-Setup-x86_64` binary is also available in the release. If your file manager refuses to launch it, enable its executable permission in **Properties → Permissions**.
+
 ## Usage
 
 Run the setup script directly:
