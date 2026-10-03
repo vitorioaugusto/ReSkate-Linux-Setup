@@ -45,7 +45,7 @@ static int exists_in_path(const char *name)
 static void extract_embedded_setup(char *output_path, size_t output_size)
 {
     const char *home = getenv("HOME");
-    if (!home || !*home) die("HOME não está definido.");
+    if (!home || !*home) die("HOME is not defined.");
 
     char cache_dir[PATH_MAX];
     snprintf(cache_dir, sizeof(cache_dir), "%s/.cache", home);
@@ -54,18 +54,18 @@ static void extract_embedded_setup(char *output_path, size_t output_size)
     char app_dir[PATH_MAX];
     snprintf(app_dir, sizeof(app_dir), "%s/.cache/reskate-setup", home);
     if (mkdir(app_dir, 0755) != 0 && errno != EEXIST)
-        die("não consegui criar ~/.cache/reskate-setup.");
+        die("could not create ~/.cache/reskate-setup.");
 
     snprintf(output_path, output_size,
              "%s/reskate-setup-final-safe.sh", app_dir);
 
     FILE *file = fopen(output_path, "wb");
-    if (!file) die("não consegui extrair o script interno.");
+    if (!file) die("could not extract the embedded setup script.");
 
     if (fwrite(embedded_setup, 1, embedded_setup_len, file) != embedded_setup_len)
     {
         fclose(file);
-        die("falha ao escrever o script interno.");
+        die("failed to write the embedded setup script.");
     }
 
     fclose(file);
@@ -75,7 +75,7 @@ static void extract_embedded_setup(char *output_path, size_t output_size)
 static int run_current_terminal(const char *script, int argc, char **argv)
 {
     char **args = calloc((size_t)argc + 2, sizeof(char *));
-    if (!args) die("sem memória.");
+    if (!args) die("out of memory.");
 
     args[0] = "bash";
     args[1] = (char *)script;
@@ -142,6 +142,6 @@ int main(int argc, char **argv)
         if (exists_in_path(terms[i]))
             return run_terminal(terms[i], script_path, argc, argv);
 
-    die("nenhum terminal compatível foi encontrado.");
+    die("no supported terminal emulator was found.");
     return EXIT_FAILURE;
 }
