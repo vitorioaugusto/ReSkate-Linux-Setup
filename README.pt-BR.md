@@ -161,6 +161,10 @@ Issues e pull requests são bem-vindos, especialmente para:
 - suporte a outros terminais;
 - melhorias na instalação de dependências fora do ecossistema Arch.
 
+## Nota de desenvolvimento
+
+**Todo o código deste projeto foi vibe-codado com auxílio de IA.** A implementação foi construída de forma iterativa por meio de prompts, testes, depuração e refinamentos, em vez de seguir um fluxo tradicional de programação do zero.
+
 ## Aviso
 
 Este é um projeto comunitário e **não é afiliado à EA, Electronic Arts, ReSkate, NVIDIA, Valve, Wine, DXVK ou VKD3D-Proton**.
