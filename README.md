@@ -81,6 +81,24 @@ Only after the game and ReSkate files are in place should you use the executable
 
 The script can automatically install several common dependencies through `pacman`.
 
+#### Steam Deck / SteamOS
+
+When you choose **Install / repair** or **Reinstall**, the setup asks whether you are using a Steam Deck / SteamOS.
+
+If you answer **Yes**, it follows the SteamOS preparation that has been confirmed to work in community testing:
+
+- temporarily disables the SteamOS read-only system partition;
+- initializes the pacman keyring;
+- populates the Arch Linux keyring and the Holo keyring when available;
+- refreshes the pacman package databases;
+- installs the required Wine/Vulkan dependencies;
+- restores SteamOS read-only mode afterwards if the setup disabled it.
+
+You will be asked for your `sudo` password during this process.
+
+> [!IMPORTANT]
+> Steam Deck support is still experimental. The current method installs system packages on SteamOS, so future SteamOS updates may require the dependencies to be installed again.
+
 #### Other distributions
 
 Before running the setup, make sure you have:
@@ -129,7 +147,7 @@ With no arguments, it first opens an interactive menu:
 5) Exit
 ```
 
-After you choose an action, the installer asks you to confirm the **skate. installation folder before making changes**. It checks the default Steam location and additional Steam library folders, including libraries stored on other SSDs. If it finds more than one installation, you can choose the correct one; you can also paste a custom path manually.
+When using **Install / repair** or **Reinstall**, the installer first asks whether the machine is a **Steam Deck / SteamOS** system. It then asks you to confirm the **skate. installation folder before making game-specific changes**. It checks the default Steam location and additional Steam library folders, including libraries stored on other SSDs. If it finds more than one installation, you can choose the correct one; you can also paste a custom path manually.
 
 You can also call each mode directly:
 

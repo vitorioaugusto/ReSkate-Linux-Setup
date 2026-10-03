@@ -9,6 +9,8 @@ PREFIX="${RESKATE_PREFIX:-$HOME/.local/share/wineprefixes/reskate-test}"
 BACKUP_ROOT="${RESKATE_BACKUP_ROOT:-$HOME/ReSkate-backups}"
 GAME_DIR="${GAME_DIR:-}"
 MODE="auto"
+STEAM_DECK=0
+STEAMOS_UNLOCKED_BY_SETUP=0
 
 log(){ printf '\n==> %s\n' "$*"; }
 warn(){ printf '\nWARNING: %s\n' "$*" >&2; }
@@ -60,12 +62,100 @@ if [[ "$MODE" == "auto" ]]; then
   esac
 fi
 
+is_steamos(){
+  [[ -r /etc/os-release ]] || return 1
+  grep -Eqi '^(ID|VARIANT_ID)=["'\'' ]*(steamos|steamdeck)' /etc/os-release
+}
+
+ask_steam_deck(){
+  local answer
+  echo
+  echo "============================================================"
+  echo " Platform"
+  echo "============================================================"
+  echo
+
+  if is_steamos; then
+    read -r -p "Are you using a Steam Deck / SteamOS? [Y/n]: " answer
+    answer="${answer:-y}"
+  else
+    read -r -p "Are you using a Steam Deck / SteamOS? [y/N]: " answer
+    answer="${answer:-n}"
+  fi
+
+  case "$answer" in
+    y|Y|yes|YES|Yes) STEAM_DECK=1 ;;
+    *) STEAM_DECK=0 ;;
+  esac
+}
+
+restore_steamos_readonly(){
+  if (( STEAMOS_UNLOCKED_BY_SETUP )); then
+    if command -v steamos-readonly >/dev/null 2>&1; then
+      log "Restoring the SteamOS read-only filesystem"
+      if sudo steamos-readonly enable; then
+        STEAMOS_UNLOCKED_BY_SETUP=0
+      else
+        warn "Could not restore the SteamOS read-only filesystem automatically."
+      fi
+    fi
+  fi
+}
+
+prepare_steam_deck(){
+  (( STEAM_DECK )) || return 0
+
+  command -v steamos-readonly >/dev/null 2>&1 ||
+    die "Steam Deck mode was selected, but steamos-readonly was not found."
+  command -v pacman-key >/dev/null 2>&1 ||
+    die "Steam Deck mode was selected, but pacman-key was not found."
+  command -v pacman >/dev/null 2>&1 ||
+    die "Steam Deck mode was selected, but pacman was not found."
+
+  log "Preparing SteamOS for dependency installation"
+  echo "The SteamOS system partition will be temporarily made writable."
+  echo "The setup will restore read-only mode after package installation."
+  echo
+
+  sudo -v
+
+  local readonly_status
+  readonly_status="$(steamos-readonly status 2>&1 || true)"
+  if grep -qi 'enabled' <<<"$readonly_status"; then
+    STEAMOS_UNLOCKED_BY_SETUP=1
+  fi
+
+  sudo steamos-readonly disable
+
+  log "Initializing the SteamOS pacman keyring"
+  sudo pacman-key --init
+  sudo pacman-key --populate archlinux
+
+  if [[ -e /usr/share/pacman/keyrings/holo.gpg || -e /usr/share/pacman/keyrings/holo-trusted ]]; then
+    sudo pacman-key --populate holo
+  else
+    warn "The Holo keyring was not found; continuing with the Arch Linux keyring."
+  fi
+
+  log "Refreshing SteamOS package databases"
+  sudo pacman -Sy
+}
+
 cleanup(){
   [[ -n "${TMPDIR_RES:-}" && -d "${TMPDIR_RES:-}" ]] && rm -rf "$TMPDIR_RES"
+  restore_steamos_readonly
 }
 trap cleanup EXIT
 
 [[ "$(uname -m)" == "x86_64" ]] || die "This setup supports Linux x86_64 only."
+
+if [[ "$MODE" == "repair" || "$MODE" == "reinstall" ]]; then
+  if [[ -t 0 && -t 1 ]]; then
+    ask_steam_deck
+  elif is_steamos; then
+    STEAM_DECK=1
+  fi
+fi
 
 discover_game_dirs(){
   local -a steam_roots=()
@@ -364,12 +454,20 @@ if [[ "$MODE" == "reinstall" && "$PREFIX_EXISTS" -eq 1 ]]; then
 fi
 
 if command -v pacman >/dev/null 2>&1; then
-  log "Installing/checking dependencies on Arch"
+  if (( STEAM_DECK )); then
+    prepare_steam_deck
+    log "Installing/checking dependencies on SteamOS"
+  else
+    log "Installing/checking dependencies on Arch"
+  fi
+
   sudo pacman -S --needed wine-staging curl tar zstd pciutils vulkan-icd-loader lib32-vulkan-icd-loader
   detect_gpu
   [[ "$GPU_VENDOR" == "nvidia" && -x "$(command -v nvidia-smi || true)" ]] && sudo pacman -S --needed nvidia-utils lib32-nvidia-utils || true
   [[ "$GPU_VENDOR" == "amd" ]] && sudo pacman -S --needed vulkan-radeon lib32-vulkan-radeon || true
   [[ "$GPU_VENDOR" == "intel" ]] && sudo pacman -S --needed vulkan-intel lib32-vulkan-intel || true
+
+  restore_steamos_readonly
 else
   warn "Non-Arch distribution: install Wine, curl, tar, zstd, and 64/32-bit Vulkan support manually."
 fi
@@ -471,6 +569,7 @@ dxvk=$DXVK_VERSION
 dxvk_nvapi=$([[ "$DLSS_CAPABLE" -eq 1 ]] && echo "$NVAPI_VERSION" || echo disabled)
 gpu_vendor=$GPU_VENDOR
 gpu_model=$GPU_MODEL
+steam_deck=$STEAM_DECK
 EOF
 
 create_launcher

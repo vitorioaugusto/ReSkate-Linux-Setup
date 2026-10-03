@@ -81,6 +81,24 @@ Somente depois que o jogo e os arquivos do ReSkate estiverem no lugar você deve
 
 O script consegue instalar várias dependências automaticamente através do `pacman`.
 
+#### Steam Deck / SteamOS
+
+Ao escolher **Install / repair** ou **Reinstall**, o setup pergunta se você está usando um Steam Deck / SteamOS.
+
+Se você responder **Yes**, ele aplica a preparação do SteamOS que já foi confirmada em testes da comunidade:
+
+- desativa temporariamente o modo somente leitura da partição do sistema;
+- inicializa o keyring do pacman;
+- popula o keyring do Arch Linux e o keyring Holo quando disponível;
+- atualiza as bases de pacotes do pacman;
+- instala as dependências necessárias de Wine/Vulkan;
+- restaura o modo somente leitura do SteamOS ao final caso o setup o tenha desativado.
+
+Durante esse processo, será solicitada a senha do `sudo`.
+
+> [!IMPORTANT]
+> O suporte ao Steam Deck ainda é experimental. O método atual instala pacotes do sistema no SteamOS, então futuras atualizações do SteamOS podem exigir que essas dependências sejam instaladas novamente.
+
 #### Outras distribuições
 
 Antes de executar o setup, deixe disponíveis:
@@ -129,7 +147,7 @@ Sem argumentos, ele abre primeiro um menu interativo. **A interface do aplicativ
 5) Exit
 ```
 
-Depois que você escolhe a ação, o instalador pede para confirmar a **pasta onde o skate. está instalado antes de fazer qualquer alteração**. Ele verifica o local padrão da Steam e também bibliotecas adicionais da Steam, inclusive as que ficam em outros SSDs. Se encontrar mais de uma instalação, você pode escolher a correta; também é possível colar um caminho manualmente.
+Ao usar **Install / repair** ou **Reinstall**, o instalador primeiro pergunta se o computador é um **Steam Deck / SteamOS**. Depois ele pede para confirmar a **pasta onde o skate. está instalado antes das alterações específicas do jogo**. Ele verifica o local padrão da Steam e também bibliotecas adicionais da Steam, inclusive as que ficam em outros SSDs. Se encontrar mais de uma instalação, você pode escolher a correta; também é possível colar um caminho manualmente.
 
 Os modos também podem ser chamados diretamente:
 
