@@ -5,6 +5,9 @@ on:
     branches:
       - main
     paths:
+      - "scripts/**"
+      - "src/**"
+      - "Makefile"
       - ".github/workflows/release.yml"
   workflow_dispatch:
 
@@ -19,6 +22,9 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
+      - name: Validate setup script
+        run: bash -n scripts/reskate-setup.sh
+
       - name: Build static executable
         run: make static
 
@@ -30,10 +36,10 @@ jobs:
       - name: Publish release
         env:
           GH_TOKEN: ${{ github.token }}
-          TAG: v0.1.0
+          TAG: v0.1.1
         run: |
           if gh release view "$TAG" >/dev/null 2>&1; then
             gh release upload "$TAG" ReSkate-Setup-x86_64 ReSkate-Setup-x86_64.tar.gz --clobber
           else
-            gh release create "$TAG" ReSkate-Setup-x86_64 ReSkate-Setup-x86_64.tar.gz --target "$GITHUB_SHA" --title "ReSkate Linux Setup v0.1.0" --notes "Initial public release. For the easiest setup, download ReSkate-Setup-x86_64.tar.gz, extract it, and run the included executable."
+            gh release create "$TAG" ReSkate-Setup-x86_64 ReSkate-Setup-x86_64.tar.gz --target "$GITHUB_SHA" --title "ReSkate Linux Setup v0.1.1" --notes "Adds game installation path confirmation before setup begins, including detection of additional Steam libraries on other drives."
           fi
