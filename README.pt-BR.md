@@ -2,6 +2,9 @@
 
 [English](README.md) | **Português (Brasil)**
 
+> [!IMPORTANT]
+> **Todo este projeto foi vibe-codado com auxílio de IA.** O código foi construído de forma iterativa por meio de prompts, testes, depuração e refinamentos, em vez de seguir um fluxo tradicional de programação do zero.
+
 Uma forma de configurar **Skate + ReSkate no Linux** usando Wine, VKD3D-Proton e DXVK, com um launcher simples e opções de backup, reparo e reinstalação.
 
 > **Status:** configuração desenvolvida e testada em Arch Linux/CachyOS com GPU NVIDIA RTX.  
@@ -160,10 +163,6 @@ Issues e pull requests são bem-vindos, especialmente para:
 - melhorias na detecção de caminhos da Steam;
 - suporte a outros terminais;
 - melhorias na instalação de dependências fora do ecossistema Arch.
-
-## Nota de desenvolvimento
-
-**Todo o código deste projeto foi vibe-codado com auxílio de IA.** A implementação foi construída de forma iterativa por meio de prompts, testes, depuração e refinamentos, em vez de seguir um fluxo tradicional de programação do zero.
 
 ## Aviso
 
