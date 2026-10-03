@@ -36,10 +36,10 @@ jobs:
       - name: Publish release
         env:
           GH_TOKEN: ${{ github.token }}
-          TAG: v0.1.1
+          TAG: v0.1.2
         run: |
           if gh release view "$TAG" >/dev/null 2>&1; then
             gh release upload "$TAG" ReSkate-Setup-x86_64 ReSkate-Setup-x86_64.tar.gz --clobber
           else
-            gh release create "$TAG" ReSkate-Setup-x86_64 ReSkate-Setup-x86_64.tar.gz --target "$GITHUB_SHA" --title "ReSkate Linux Setup v0.1.1" --notes "Adds game installation path confirmation before setup begins, including detection of additional Steam libraries on other drives."
+            gh release create "$TAG" ReSkate-Setup-x86_64 ReSkate-Setup-x86_64.tar.gz --target "$GITHUB_SHA" --title "ReSkate Linux Setup v0.1.2" --notes "Translates the entire application interface and launcher messages to English. Also includes the game installation path confirmation and additional Steam library detection."
           fi
