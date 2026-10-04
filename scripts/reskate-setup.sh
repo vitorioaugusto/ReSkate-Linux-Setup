@@ -405,7 +405,7 @@ if command -v nvidia-smi >/dev/null 2>&1; then
 fi
 
 cd "$GAME_DIR"
-exec wine ./ReSkateLauncher.exe --offline --no-update --no-gui --log-level=info
+exec wine ./ReSkateLauncher.exe --offline --no-update --log-level=info
 EOF
   chmod +x "$HOME/.local/bin/reskate"
 

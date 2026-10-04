@@ -36,10 +36,10 @@ jobs:
       - name: Publish release
         env:
           GH_TOKEN: ${{ github.token }}
-          TAG: v0.1.4
+          TAG: v0.1.5
         run: |
           if gh release view "$TAG" >/dev/null 2>&1; then
             gh release upload "$TAG" ReSkate-Setup-x86_64 ReSkate-Setup-x86_64.tar.gz --clobber
           else
-            gh release create "$TAG" ReSkate-Setup-x86_64 ReSkate-Setup-x86_64.tar.gz --target "$GITHUB_SHA" --title "ReSkate Linux Setup v0.1.4" --notes "Adds an interactive Steam Deck / SteamOS setup path. It temporarily unlocks the SteamOS root filesystem, initializes the pacman keyrings, refreshes package databases, installs the required dependencies, and restores read-only mode afterwards."
+            gh release create "$TAG" ReSkate-Setup-x86_64 ReSkate-Setup-x86_64.tar.gz --target "$GITHUB_SHA" --title "ReSkate Linux Setup v0.1.5" --notes "Removes the default --no-gui launch flag so the ReSkate Launcher interface and Mod Manager open normally."
           fi
